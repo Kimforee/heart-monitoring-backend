@@ -1,0 +1,51 @@
+{
+    "info": {
+      "name": "HeartMonitoring API",
+      "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+      {
+        "name": "Register",
+        "request": {
+          "method": "POST",
+          "header": [{"key":"Content-Type","value":"application/json"}],
+          "body": {"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"supersecret123\",\"email\":\"a@ex.com\"}"},
+          "url": {"raw":"http://localhost:8000/api/accounts/register/","host":["http://localhost:8000"], "path":["api","accounts","register",""]}
+        }
+      },
+      {
+        "name": "Token",
+        "request": {
+          "method": "POST",
+          "header": [{"key":"Content-Type","value":"application/json"}],
+          "body": {"mode":"raw","raw":"{\"username\":\"alice\",\"password\":\"supersecret123\"}"},
+          "url": {"raw":"http://localhost:8000/api/auth/token/","host":["http://localhost:8000"], "path":["api","auth","token",""]}
+        }
+      },
+      {
+        "name": "Create Patient",
+        "request": {
+          "method": "POST",
+          "header": [
+            {"key":"Content-Type","value":"application/json"},
+            {"key":"Authorization","value":"Bearer {{access_token}}"}
+          ],
+          "body": {"mode":"raw","raw":"{\"first_name\":\"Bob\",\"last_name\":\"B\"}"},
+          "url": {"raw":"http://localhost:8000/api/patients/patients/","host":["http://localhost:8000"], "path":["api","patients","patients",""]}
+        }
+      },
+      {
+        "name": "Create HeartRate",
+        "request": {
+          "method": "POST",
+          "header": [
+            {"key":"Content-Type","value":"application/json"},
+            {"key":"Authorization","value":"Bearer {{access_token}}"}
+          ],
+          "body": {"mode":"raw","raw":"{\"patient\":1,\"bpm\":78,\"recorded_at\":\"2025-09-20T10:00:00Z\"}"},
+          "url": {"raw":"http://localhost:8000/api/patients/heartrates/","host":["http://localhost:8000"], "path":["api","patients","heartrates",""]}
+        }
+      }
+    ]
+  }
+  
