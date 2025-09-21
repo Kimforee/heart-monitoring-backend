@@ -6,7 +6,7 @@ Small backend to manage users, patients, and heart-rate readings. Built with Dja
 
 ```bash
 # clone
-git clone <your-repo-url>
+git clone <repo-url>
 cd heart_monitoring
 
 # virtualenv
@@ -104,7 +104,7 @@ python manage.py test
 pytest -q
 ```
 
-CI: a GitHub Actions workflow at `.github/workflows/ci.yml` will run `makemigrations`, `migrate`, and `test`.
+CI: a GitHub Actions workflow at `.github/workflows/ci.yml` will run `makemigrations`, `migrate`
 
 ## Assumptions & decisions
 
@@ -114,48 +114,8 @@ CI: a GitHub Actions workflow at `.github/workflows/ci.yml` will run `makemigrat
 * SQLite for dev, easy to switch to Postgres by changing `DATABASES`.
 * Basic permission model: owner, clinician, or staff can create/update/delete; others only read their own patients/readings.
 * Heart rate `bpm` validation: sane bounds (20–300). `recorded_at` cannot be far in the future.
-
-## Next steps (Part 4 preview)
-
-* Add nicer OpenAPI annotations (examples, response examples).
-* Add Postman collection file or exported HTTP collection JSON.
-* Add production-ready config: Dockerfile, gunicorn, env-based settings, Postgres in production, static files handling, and deployment instructions.
-* Increase test coverage and add code coverage reporting.
-
-````
-
 ---
 
-# 7) Postman / HTTP collection (curl snippets already provided)
-
-If you want a Postman collection JSON I can generate one — say so and I’ll produce an exportable JSON you can import.
-
----
-
-# 8) What I did not run (and what you should run locally)
-
-I provided tests and CI config, but I didn't run them in your environment. Run locally:
-
-```bash
-pip install -r requirements.txt
-python manage.py makemigrations
-python manage.py migrate
-python manage.py test
-````
-
-If any tests fail due to timezone behavior or slight serializer differences, tweak the test tolerances (the code includes small flexibility points). Tell me test failures and I'll help fix them.
-
----
-
-# 9) Suggestions / improvements for production
-
-* Replace SQLite with Postgres and configure DB credentials via env vars.
-* Use `django-environ` or `python-decouple` for environment configuration.
-* Add request/response logging and Sentry for error monitoring.
-* Add throttling (DRF throttling classes) for rate-limiting device ingestion endpoints.
-* Consider batching heart rate ingestion (bulk create) for device uploads.
-* Add API key or client credentials for devices to authenticate ingestion (device-level auth), separate from user JWTs.
-* Add background jobs for heavy processing (Celery + Redis) if you process streams or compute metrics.
 
 ---
 
@@ -169,7 +129,6 @@ If any tests fail due to timezone behavior or slight serializer differences, twe
 4. Admin: http://localhost:8000/admin
 
 Notes:
-- The service runs with Gunicorn behind optional Nginx.
 - For production, run behind HTTPS (use Let's Encrypt / certbot) and put nginx in front.
 
 deploy locally with Docker
@@ -189,14 +148,5 @@ docker compose exec web python manage.py createsuperuser
 
 # 5) Stop
 docker compose down
-
-
-# Wrap-up checklist (what Part 3 added)
-
-* [x] OpenAPI schema + Swagger & Redoc
-* [x] Expanded unit tests for validation, filtering, pagination, permissions
-* [x] GitHub Actions workflow for tests
-* [x] README updated with API docs, curl examples, testing & CI instructions
-* [x] Guidance for Part 4 (production + deployment + docs polishing)
 
 ---
