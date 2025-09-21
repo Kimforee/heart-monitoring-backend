@@ -11,10 +11,10 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 import os
-from .settings import *  # import base dev settings as default
 import dj_database_url
 from pathlib import Path
 from dotenv import load_dotenv
+from datetime import timedelta
 
 # load .env if present (useful in local docker dev)
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -28,10 +28,7 @@ SECRET_KEY = 'django-insecure-%r$-km*a*398s1!-_669f15c+#vs4zq9^1!#!pok293w_jpt7l
 
 # SECURITY
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", SECRET_KEY)
-DEBUG = os.environ.get("DEBUG", "False").lower() in ("1", "true", "yes")
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DEBUG", "True").lower() in ("1", "true", "yes")
 
 allowed = os.environ.get("DJANGO_ALLOWED_HOSTS", "")
 ALLOWED_HOSTS = [h.strip() for h in allowed.split(",")] if allowed else ["*"]
@@ -92,18 +89,18 @@ WSGI_APPLICATION = 'heart_monitoring.wsgi.application'
 
 
 # Database - prefer DATABASE_URL
-DATABASE_URL = os.environ.get("DATABASE_URL")
-if DATABASE_URL:
-    DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
-else:
-    # fallback to sqlite from base settings
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
+# DATABASE_URL = os.environ.get("DATABASE_URL")
+# if DATABASE_URL:
+#     DATABASES = {"default": dj_database_url.parse(DATABASE_URL, conn_max_age=600)}
+# else:
+#     # fallback to sqlite from base settings
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
-    pass
+}
+    
 
 
 # Use a custom user model (we'll define it in accounts.models.CustomUser)
