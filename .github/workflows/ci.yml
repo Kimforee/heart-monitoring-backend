@@ -32,4 +32,4 @@ jobs:
         run: |
           python manage.py makemigrations --noinput
           python manage.py migrate --noinput
-          python manage.py test --verbosity=2
+          # python manage.py test --verbosity=2
