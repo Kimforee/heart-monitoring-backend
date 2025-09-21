@@ -1,10 +1,11 @@
 # accounts/tests.py
+from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
-from django.contrib.auth import get_user_model
 
 User = get_user_model()
+
 
 class AccountsAPITest(TestCase):
     def setUp(self):
@@ -40,9 +41,13 @@ class AccountsAPITest(TestCase):
         self.assertEqual(resp.status_code, 401)
 
     def test_profile_returns_user(self):
-        user = User.objects.create_user(username="me", password="pw12345678", email="me@example.com")
+        User.objects.create_user(
+            username="me", password="pw12345678", email="me@example.com"
+        )
         # obtain token
-        token_resp = self.client.post(self.token_url, {"username": "me", "password": "pw12345678"}, format="json")
+        token_resp = self.client.post(
+            self.token_url, {"username": "me", "password": "pw12345678"}, format="json"
+        )
         access = token_resp.data["access"]
         self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {access}")
         resp = self.client.get(self.profile_url)

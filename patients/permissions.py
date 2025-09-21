@@ -1,11 +1,13 @@
 # patients/permissions.py
 from rest_framework import permissions
 
+
 class IsOwnerOrClinicianOrReadOnly(permissions.BasePermission):
     """
     - Read: allowed for authenticated users (you can restrict further if needed).
-    - Write: allowed if user is owner of the patient (patient.owner) OR user.is_clinician OR user.is_staff.
+    - Write: allowed if user is owner (patient.owner) OR user.is_clinician OR user.is_staff.
     """
+
     def has_permission(self, request, view):
         # Ensure authenticated for all API access except you'd explicitly allow otherwise
         return bool(request.user and request.user.is_authenticated)
@@ -18,7 +20,9 @@ class IsOwnerOrClinicianOrReadOnly(permissions.BasePermission):
         # Map if obj is HeartRate, check obj.patient.owner
         patient_owner = getattr(obj, "patient", None) or getattr(obj, "owner", None)
         # If obj is Patient, `patient_owner` is obj.owner (via getattr above)
-        if hasattr(patient_owner, "owner") and not isinstance(patient_owner, (int, str)):
+        if hasattr(patient_owner, "owner") and not isinstance(
+            patient_owner, (int, str)
+        ):
             # fallback
             pass
         # If patient_owner is a User instance:

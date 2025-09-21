@@ -1,15 +1,20 @@
 # patients/models.py
-from django.db import models
 from django.conf import settings
+from django.db import models
+
 
 class Patient(models.Model):
     """
     Represents a patient monitored by the devices.
     """
+
     # who added/owns this patient (clinician or user)
     owner = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True,
-        related_name="patients"
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="patients",
     )
 
     # core patient fields
@@ -19,8 +24,12 @@ class Patient(models.Model):
     sex = models.CharField(max_length=10, blank=True)  # 'M','F','Other' or free text
     place = models.CharField(max_length=255, blank=True)  # optional place/ward/room
 
-    external_id = models.CharField(max_length=128, blank=True, null=True,
-                                   help_text="Optional external identifier (device/patient id)")
+    external_id = models.CharField(
+        max_length=128,
+        blank=True,
+        null=True,
+        help_text="Optional external identifier (device/patient id)",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -33,17 +42,25 @@ class Patient(models.Model):
         ]
 
     def __str__(self):
-        return f"{self.first_name} {self.last_name or ''}".strip() + (f" ({self.external_id})" if self.external_id else "")
+        return f"{self.first_name} {self.last_name or ''}".strip() + (
+            f" ({self.external_id})" if self.external_id else ""
+        )
+
 
 class HeartRate(models.Model):
     """
     Heart rate reading record for a patient.
     """
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name="heart_rates")
+
+    patient = models.ForeignKey(
+        Patient, on_delete=models.CASCADE, related_name="heart_rates"
+    )
     bpm = models.PositiveSmallIntegerField()  # beats per minute
     recorded_at = models.DateTimeField()  # when the reading was taken
     device_id = models.CharField(max_length=128, blank=True, null=True)
-    metadata = models.JSONField(blank=True, null=True, help_text="Optional additional data from device")
+    metadata = models.JSONField(
+        blank=True, null=True, help_text="Optional additional data from device"
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
 

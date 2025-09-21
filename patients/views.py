@@ -1,22 +1,22 @@
 # patients/views.py
-from rest_framework import viewsets, permissions, status
-from rest_framework.decorators import action
-from rest_framework.response import Response
-from rest_framework.exceptions import PermissionDenied, NotFound
-from django.utils.dateparse import parse_datetime, parse_date
 from django.utils import timezone
+from django.utils.dateparse import parse_date, parse_datetime
+from rest_framework import permissions, viewsets
+from rest_framework.exceptions import PermissionDenied
 
-from .models import Patient, HeartRate
-from .serializers import PatientSerializer, HeartRateSerializer
+from .models import HeartRate, Patient
 from .permissions import IsOwnerOrClinicianOrReadOnly
+from .serializers import HeartRateSerializer, PatientSerializer
+
 
 class PatientViewSet(viewsets.ModelViewSet):
     """
     /api/patients/patients/
-    - list: returns patients owned by current user, unless user.is_clinician or is_staff -> returns all
+    - list: returns patients owned by curr user, unless user.is_clinician or is_staff -> returns all
     - create: sets owner=request.user
     - retrieve/update/destroy: permission enforced (owner/staff/clinician)
     """
+
     serializer_class = PatientSerializer
     queryset = Patient.objects.all()
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrClinicianOrReadOnly]
@@ -41,6 +41,7 @@ class PatientViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
+
 class HeartRateViewSet(viewsets.ModelViewSet):
     """
     /api/patients/heartrates/
@@ -48,6 +49,7 @@ class HeartRateViewSet(viewsets.ModelViewSet):
     - create: enforces that only owner / clinician / staff can create for a patient
     - retrieve: available
     """
+
     serializer_class = HeartRateSerializer
     queryset = HeartRate.objects.select_related("patient").all()
     permission_classes = [permissions.IsAuthenticated, IsOwnerOrClinicianOrReadOnly]
@@ -73,16 +75,26 @@ class HeartRateViewSet(viewsets.ModelViewSet):
                 # normalize date -> start of day, datetime -> direct
                 if isinstance(dt, timezone.datetime) and dt.tzinfo is None:
                     dt = timezone.make_aware(dt, timezone.utc)
-                if isinstance(dt, timezone.date) and not isinstance(dt, timezone.datetime):
-                    dt = timezone.make_aware(timezone.datetime.combine(dt, timezone.datetime.min.time()), timezone.utc)
+                if isinstance(dt, timezone.date) and not isinstance(
+                    dt, timezone.datetime
+                ):
+                    dt = timezone.make_aware(
+                        timezone.datetime.combine(dt, timezone.datetime.min.time()),
+                        timezone.utc,
+                    )
                 qs = qs.filter(recorded_at__gte=dt)
         if end:
             dt = parse_datetime(end) or parse_date(end)
             if dt:
                 if isinstance(dt, timezone.datetime) and dt.tzinfo is None:
                     dt = timezone.make_aware(dt, timezone.utc)
-                if isinstance(dt, timezone.date) and not isinstance(dt, timezone.datetime):
-                    dt = timezone.make_aware(timezone.datetime.combine(dt, timezone.datetime.max.time()), timezone.utc)
+                if isinstance(dt, timezone.date) and not isinstance(
+                    dt, timezone.datetime
+                ):
+                    dt = timezone.make_aware(
+                        timezone.datetime.combine(dt, timezone.datetime.max.time()),
+                        timezone.utc,
+                    )
                 qs = qs.filter(recorded_at__lte=dt)
 
         # If user is not clinician/staff, restrict to heart rates of patients they own
@@ -96,6 +108,12 @@ class HeartRateViewSet(viewsets.ModelViewSet):
         patient = serializer.validated_data.get("patient")
         user = self.request.user
         # If patient has an owner and it's not the user and user not clinician/staff -> deny
-        if patient.owner and patient.owner != user and not (user.is_staff or getattr(user, "is_clinician", False)):
-            raise PermissionDenied("You are not allowed to add readings for this patient.")
+        if (
+            patient.owner
+            and patient.owner != user
+            and not (user.is_staff or getattr(user, "is_clinician", False))
+        ):
+            raise PermissionDenied(
+                "You are not allowed to add readings for this patient."
+            )
         serializer.save()

@@ -1,7 +1,10 @@
 # patients/serializers.py
-from rest_framework import serializers
-from .models import Patient, HeartRate
 from django.utils import timezone
+from drf_spectacular.utils import OpenApiExample, extend_schema_serializer
+from rest_framework import serializers
+
+from .models import HeartRate, Patient
+
 
 class PatientSerializer(serializers.ModelSerializer):
     owner = serializers.ReadOnlyField(source="owner.id")
@@ -22,13 +25,17 @@ class PatientSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ("created_at", "updated_at")
 
-from drf_spectacular.utils import extend_schema_serializer, OpenApiExample
 
 @extend_schema_serializer(
     examples=[
         OpenApiExample(
             "Normal reading",
-            value={"patient": 1, "bpm": 72, "recorded_at": "2025-09-20T10:00:00Z", "device_id": "device-abc"},
+            value={
+                "patient": 1,
+                "bpm": 72,
+                "recorded_at": "2025-09-20T10:00:00Z",
+                "device_id": "device-abc",
+            },
             request_only=True,
         )
     ]
@@ -38,6 +45,7 @@ class HeartRateSerializer(serializers.ModelSerializer):
     Serializer for HeartRate reading. Validation enforces sensible `bpm` range
     and that `recorded_at` is a timezone-aware datetime (or naive treated as UTC).
     """
+
     class Meta:
         model = HeartRate
         fields = [

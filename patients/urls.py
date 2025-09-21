@@ -1,7 +1,8 @@
 # patients/urls.py
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from django.urls import path, include
-from .views import PatientViewSet, HeartRateViewSet
+
+from .views import HeartRateViewSet, PatientViewSet
 
 router = DefaultRouter()
 router.register(r"patients", PatientViewSet, basename="patient")
